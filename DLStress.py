@@ -30,6 +30,14 @@ from numpy.random import RandomState
 import scipy.io as sio
 import time
 import matlab.engine
+import tensorflow as tf
+
+#######################################
+# Temp workaround to prevent TensorFlow from crashing with: 
+# tensorflow/stream_executor/cuda/cuda_dnn.cc:336] Could not create cudnn handle: CUDNN_STATUS_NOT_INITIALIZED
+gpus = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_virtual_device_configuration(gpus[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+#######################################
 
 #%% Unsupervised Learning is done in Matlab
 def UnsupervisedLearning(DataFile, ShapeDataFile, StressDataFile, IdxList_train, IdxList_test):
@@ -310,6 +318,11 @@ sio.savemat(ResultFile,
     'S11AE':S11AE,'S11APE':S11APE,
     'S22AE':S22AE,'S22APE':S22APE,
     'S12AE':S12AE,'S12APE':S12APE})
+#%%
+# to save the predicted stress distribution during cross validation
+# insert the function below to the code block of the cross validation
+# sio.savemat('StressData_pred.mat', {'Sp':Sp, 'idx_test':idx_test})
+#%% show the time cost on the testing set: input shape, output stress
 
 t_start=time.clock()
 X_t=ShapeEncoder.predict(ShapeData_test.transpose(), batch_size=100, verbose=0)
@@ -340,5 +353,8 @@ for n in range(0, idx_test.size):
 Sp=numpy.asmatrix(Sp)
 t_end=time.clock()
 print('Time Cost Per Testing Sample ', (t_end-t_start)/73)
+
+sio.savemat('StressData_pred.mat', {'Sp':Sp, 'idx_test':idx_test})
+
 
 

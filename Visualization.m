@@ -43,6 +43,7 @@ for ShapeIndex=1:729
 	WritePolygonMeshAsVTKFile(Mesh3D, sprintf('result/%d_StressGrid_FEA.vtk', ShapeIndex));
 end
 %% load predicted stress and idx_test
+
 load('StressData_pred.mat')
 for k=1:size(Sp, 2)
 	StressData_pred(1,:,k)=Sp(1:5000,k);
@@ -51,6 +52,7 @@ for k=1:size(Sp, 2)
 end
 %% show predicted stress on 3D and 2D meshes of the shapes in the testing set (idx_test)
 
+%for Index=1:length(idx_test)
 for Index=1:length(idx_test)
 	ShapeIndex=idx_test(Index);
 	S11=StressData_pred(1,:,Index);
@@ -82,7 +84,8 @@ for Index=1:length(idx_test)
 	S12=reshape(S12, [50, 100]);
 	S12(end+1,:)=S12(1,:);
 	Von=sqrt(S11.*S11+S22.*S22-S11.*S22+3*S12.*S12);
-	Mesh2D = ReadPolygonMeshFromVTKFile('result/TemplateMesh2D.vtk');
+	%Mesh2D = ReadPolygonMeshFromVTKFile('result/TemplateMesh2D.vtk');
+    Mesh2D = ReadPolygonMeshFromVTKFile('TemplateMesh2D.vtk');
 	Mesh2D.PointData(1).Name='S11';
 	Mesh2D.PointData(1).Data=S11(:);
 	Mesh2D.PointData(2).Name='S22';

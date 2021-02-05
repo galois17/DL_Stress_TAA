@@ -4,9 +4,11 @@ function Mesh = ReadMeshFromVTKFile(FilePathAndName)
 Mesh.Point=[];
 Mesh.Element={};
 fid=fopen(FilePathAndName, 'r');
+disp('read mesh file')
+disp(FilePathAndName)
 if fid == -1
-error('can not open vtk file')
-return
+    error('can not open vtk file')
+    return
 end
 LineStr = fgets(fid);%# vtk DataFile Version 3.0
 tempIndex = strfind(LineStr, '#');

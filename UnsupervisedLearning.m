@@ -84,7 +84,7 @@ C1=Data1*Data1'/size(Data1, 1);
 [P1, L1, V1]=svd(C1);
 L1=sqrt(diag(L1));
 %% setup MatConvnet
-run('/Users/khemveasna/Documents/BioMade_Research/matconvnet/matlab/vl_setupnn.m' )
+run('G:/BioMade/matconvnet/matlab/vl_setupnn.m' )
 
 
 W1=[];

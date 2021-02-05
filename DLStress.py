@@ -1,3 +1,28 @@
+#===========================================================================================
+#Copyright (c) 2018 by Georgia Tech Research Corporation.
+#All rights reserved.
+#
+#The files contain code and data associated with the paper titled
+#"A Deep Learning Approach to Estimate Stress Distribution: A Fast and
+#Accurate Surrogate of Finite Element Analysis".
+#
+#The paper is authored by Liang Liang, Minliang Liu, Caitlin Martin,
+#and Wei Sun, and published at Journal of The Royal Society Interface, 2018.
+#
+#The file list: ShapeData.mat, StressData.mat, DLStress.py, im2patch.m,
+#UnsupervisedLearning.m, ReadMeshFromVTKFile.m, ReadPolygonMeshFromVTKFile.m,
+#WritePolygonMeshAsVTKFile.m, Visualization.m, TemplateMesh3D.vtk, TemplateMesh2D.vtk.
+#Note: *.m and *.py files were converted to pdf files for documentation purpose.
+#
+#THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES,
+#INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+#FOR A PARTICULAR PURPOSE.
+#===========================================================================================
+#%%
+# go to cmd and follow the instructions to setup matlab python engine
+#https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html
+#%%
+
 from keras.models import Sequential
 from keras.layers import Dense, Conv2DTranspose
 import numpy
@@ -154,7 +179,8 @@ VMAE=[]; VMAPE=[];
 IndexList_test=[];
 IndexList_train=[];
 
-for k in range(0, 100):
+#for k in range(0, 100):
+for k in range(0, 5):
     #specify traning set and testing set
     rng.shuffle(IndexList)
     idx_train=IndexList[0:656]
@@ -262,8 +288,19 @@ for k in range(0, 100):
     print('S12peak', numpy.mean(S12AE), numpy.std(S12AE), numpy.mean(S12APE), numpy.std(S12APE))
 
 
+# sio.savemat(ResultFile,
+#     {'DataFile':DataFile,
+#     'IndexList_test':IndexList_test, 'IndexList_train':IndexList_train,
+#     'VMMAE':VMMAE, 'VMNMAE':VMNMAE,
+#     'S11MAE':S11MAE, 'S11NMAE':S11NMAE,
+#     'S22MAE':S22MAE, 'S22NMAE':S22NMAE,
+#     'S12MAE':S12MAE, 'S12NMAE':S12NMAE,
+#     'VMAE':VMAE,'APE':VMAPE,
+#     'S11AE':S11AE,'S11APE':S11APE,
+#     'S22AE':S22AE,'S22APE':S22APE,
+#     'S12AE':S12AE,'S12APE':S12APE})
 sio.savemat(ResultFile,
-    {'DataFile':DataFile,
+    {'DataFile':TempDataFile,
     'IndexList_test':IndexList_test, 'IndexList_train':IndexList_train,
     'VMMAE':VMMAE, 'VMNMAE':VMNMAE,
     'S11MAE':S11MAE, 'S11NMAE':S11NMAE,

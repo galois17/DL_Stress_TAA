@@ -187,8 +187,7 @@ VMAE=[]; VMAPE=[];
 IndexList_test=[];
 IndexList_train=[];
 
-#for k in range(0, 100):
-for k in range(0, 5):
+for k in range(0, 100):
     #specify traning set and testing set
     rng.shuffle(IndexList)
     idx_train=IndexList[0:656]
@@ -198,10 +197,10 @@ for k in range(0, 5):
     ShapeData_train=ShapeData[:,idx_train]
     ShapeData_test=ShapeData[:,idx_test]
     #unsupervised learning in Matlab
-    t1=time.clock()
+    t1=time.perf_counter()
     
     [X, X_t, Y, Y_t, S, S_t, L, W1, W2, Proj, MeanShape]=UnsupervisedLearning(TempDataFile, ShapeDataFile, StressDataFile, idx_train, idx_test)
-    t2=time.clock()
+    t2=time.perf_counter()
     
     print(k, 'Unsupervised Learning', t2-t1)
     #subtract mean shape
@@ -215,7 +214,7 @@ for k in range(0, 5):
     ShapeEncoder = CreateModel_ShapeEncoding(5000, Proj)
     X=ShapeEncoder.predict(ShapeData_train.transpose(), batch_size=100, verbose=0)
     X_t=ShapeEncoder.predict(ShapeData_test.transpose(), batch_size=100, verbose=0)
-    t3=time.clock()
+    t3=time.perf_counter()
     print(k, 'Shape Encoding', t3-t2)
     NMapper=CreateModel_NonlinearMapping(X.shape, Y.shape)
     NMapper.fit(X, Y, epochs=5000, batch_size=100, verbose=0)
@@ -229,7 +228,7 @@ for k in range(0, 5):
     for n in range(0, idx_test.size):
         Ypp[n,0,0,:]=Yp[n,:]
     #end
-    t4=time.clock()
+    t4=time.perf_counter()
     print(k, 'Nonlinear Mapping', t4-t3)
 
     StressDecoder=CreateModel_StressDecoding(W1, W2);
@@ -248,16 +247,18 @@ for k in range(0, 5):
         Sp[10000:15000,n]=tempS12
     #end
     Sp=numpy.asmatrix(Sp)
-    t5=time.clock()
+    t5=time.perf_counter()
     print(k, 'Stress Decoding', t5-t4)
 
     #compare ground-truth S and predicted Sp
     [S11MAE_k, S11NMAE_k]=ComputeError(S_t[0:5000,:], Sp[0:5000,:])
     S11MAE.append(S11MAE_k)
     S11NMAE.append(S11NMAE_k)
+
     [S22MAE_k, S22NMAE_k]=ComputeError(S_t[5000:10000,:], Sp[5000:10000,:])
     S22MAE.append(S22MAE_k)
     S22NMAE.append(S22NMAE_k)
+
     [S12MAE_k, S12NMAE_k]=ComputeError(S_t[10000:15000,:], Sp[10000:15000,:])
     S12MAE.append(S12MAE_k)
     S12NMAE.append(S12NMAE_k)
@@ -284,13 +285,15 @@ for k in range(0, 5):
     VMAPE.append(VMAPE_k)
 
     #report
-    t6=time.clock()
+    t6=time.perf_counter()
     print(k, 'ComputeError', t6-t5)
     print('VM', numpy.mean(VMMAE), numpy.std(VMMAE), numpy.mean(VMNMAE), numpy.std(VMNMAE))
     print('S11', numpy.mean(S11MAE), numpy.std(S11MAE), numpy.mean(S11NMAE), numpy.std(S11NMAE))
     print('S22', numpy.mean(S22MAE), numpy.std(S22MAE), numpy.mean(S22NMAE), numpy.std(S22NMAE))
     print('S12', numpy.mean(S12MAE), numpy.std(S12MAE), numpy.mean(S12NMAE), numpy.std(S12NMAE))
+
     print('VMpeak', numpy.mean(VMAE), numpy.std(VMAE), numpy.mean(VMAPE), numpy.std(VMAPE))
+
     print('S11peak', numpy.mean(S11AE), numpy.std(S11AE), numpy.mean(S11APE), numpy.std(S11APE))
     print('S22peak', numpy.mean(S22AE), numpy.std(S22AE), numpy.mean(S22APE), numpy.std(S22APE))
     print('S12peak', numpy.mean(S12AE), numpy.std(S12AE), numpy.mean(S12APE), numpy.std(S12APE))
@@ -324,7 +327,7 @@ sio.savemat(ResultFile,
 # sio.savemat('StressData_pred.mat', {'Sp':Sp, 'idx_test':idx_test})
 #%% show the time cost on the testing set: input shape, output stress
 
-t_start=time.clock()
+t_start=time.perf_counter()
 X_t=ShapeEncoder.predict(ShapeData_test.transpose(), batch_size=100, verbose=0)
 Yp=NMapper.predict(X_t, batch_size=idx_test.size, verbose=0)
 for n in range(0, 64):
@@ -351,7 +354,7 @@ for n in range(0, idx_test.size):
     Sp[10000:15000,n]=tempS12
 #end
 Sp=numpy.asmatrix(Sp)
-t_end=time.clock()
+t_end=time.perf_counter()
 print('Time Cost Per Testing Sample ', (t_end-t_start)/73)
 
 sio.savemat('StressData_pred.mat', {'Sp':Sp, 'idx_test':idx_test})
